@@ -100,6 +100,26 @@
       .notice { padding: 12px; border: 1px solid #f0d899; border-radius: 8px; color: #725823; background: #fffbe9; font-size: 13px; }
       @media (max-width: 900px) { .shell { grid-template-columns: 1fr; }.side { position: static; border-right: 0; border-bottom: 1px solid var(--line); }.nav { grid-template-columns: repeat(3, 1fr); }.side-note { display: none; }.grid, .scenario-layout { grid-template-columns: 1fr; }.hero { align-items: start; flex-direction: column; }.search { display: none; }.live-task .task { grid-template-columns: 48px 1fr; }.task-status { grid-column: 2; text-align: left; } }
       @media (max-width: 560px) { main { padding: 20px 14px; }.topbar { padding: 0 14px; }.safe { display: none; }.nav { overflow: auto; display: flex; }.nav button { white-space: nowrap; }.graph { padding-inline: 8px; } }
+
+      /* Redesign: editorial Git learning workspace */
+      :root { --ink:#17161c; --muted:#706d78; --line:#e8e5ef; --violet:#5b36d6; --violet-soft:#f4f1ff; --orange:#ff5f45; --green:#1c9b68; --bg:#ffffff; }
+      body { background:#fff; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .topbar { height:94px; background:#fff; border-bottom:1px solid var(--line); color:var(--ink); padding:0 42px; }
+      .brand { font-size:32px; letter-spacing:-.055em; }.brand b { color:var(--orange); }.search { display:none; }
+      .safe { margin-left:auto; border:0; padding:0; border-radius:0; color:#45414b; font-size:14px; }.safe::before { content:'◈'; color:var(--orange); font-size:25px; vertical-align:-3px; margin-right:10px; }
+      .shell { grid-template-columns:88px minmax(0,1fr); min-height:calc(100vh - 94px); }.side { padding:0; background:#fff; border-right:1px solid var(--line); }.project,.side-note { display:none; }
+      .nav { gap:0; padding-top:18px; }.nav button { position:relative; height:78px; padding:0; border-radius:0; font-size:0; color:#1d1a22; }.nav button::before { display:grid; place-items:center; width:100%; height:100%; font-size:25px; font-weight:500; }
+      .nav button[data-view="lab"]::before { content:'⌘'; }.nav button[data-view="theory"]::before { content:'▤'; }
+      .nav button:hover,.nav button.active { background:#fff8f6; color:var(--orange); }.nav button.active::after { content:''; position:absolute; left:0; top:14px; bottom:14px; width:3px; background:var(--orange); }
+      main { max-width:none; padding:42px clamp(28px,5vw,92px) 72px; }.crumb,.eyebrow { display:none; }.hero { align-items:flex-start; margin-bottom:28px; }.hero h1 { margin:0 0 9px; font-size:clamp(34px,4.1vw,58px); line-height:.98; letter-spacing:-.068em; }.hero p { color:#615e67; max-width:620px; font-size:16px; }.progress { min-width:128px; margin-top:4px; padding:13px 15px; border:1px solid #e4ddff; border-radius:10px; background:#fbfaff; }.progress b { color:var(--violet); font-size:18px; }.progress span { color:#777180; }.meter { background:#ebe7f6; }.meter i { background:var(--violet); }
+      .card { border:1px solid var(--line); border-radius:14px; box-shadow:0 12px 32px rgba(31,19,66,.045); }.card-head { padding:18px 22px; background:#fff; border-color:var(--line); }.card h2,.card h3 { font-size:18px; letter-spacing:-.025em; }.label { border-radius:5px; background:#f4f1ff; color:var(--violet); font-size:10px; }
+      .live-task { border:1.5px solid var(--orange); border-radius:16px; margin-bottom:34px; box-shadow:none; }.live-task .card-head { border:0; padding:21px 30px 0; }.live-task .card-head h2 { color:var(--orange); font-size:19px; }.live-task .task { grid-template-columns:1fr auto; padding:18px 34px 30px; gap:18px; }.task-number { display:none; }.live-task h2 { font-size:clamp(38px,4.4vw,64px); line-height:.96; letter-spacing:-.07em; margin:0 0 22px; }.live-task p { font-size:18px; color:#25222b; max-width:670px; }.live-task .task-context { margin-top:14px; color:#5f5b66; font-size:14px; line-height:1.6; }.live-task .goal { margin-top:22px; max-width:690px; padding:15px 18px; border-left:0; border:1px solid #ffd0c8; border-radius:10px; background:#fff8f6; color:#3c2624; }.task-status { align-self:start; min-width:0; color:#6d6772; font-weight:700; }
+      .button { border-radius:8px; border:1px solid #ded9ea; padding:9px 13px; background:#fff; color:#2b2731; font-size:13px; }.button:hover { border-color:var(--orange); color:var(--orange); }.button.primary { background:var(--orange); border-color:var(--orange); }
+      .grid { grid-template-columns:minmax(0,1.2fr) minmax(360px,.8fr); gap:34px; align-items:start; }.grid > section:first-child { order:2; }.grid > section:nth-child(2) { order:1; }
+      .grid > section:nth-child(2) .card-head { border:0; padding:20px 22px 12px; }.state { min-height:0; padding:0 22px 14px; color:#77717f; font-size:12px; line-height:1.55; border-bottom:1px solid var(--line); }.terminal { margin:0 18px 18px; border-radius:12px; background:#191a22; box-shadow:inset 0 0 0 1px rgba(255,255,255,.07); }.terminal-head { padding:13px 16px; font-size:12px; }.terminal-out { height:300px; padding:18px; font-size:13px; }.command-line { padding:12px 15px; }.command-line input { font-size:14px; }.command-line button { border-radius:8px; padding:8px 13px; background:var(--orange); color:#fff; }.tips { padding:0 22px 18px; }
+      .grid > section:first-child .card-head h2::after { content:' · как в GitLab'; color:#8c8792; font-weight:500; }.graph { min-height:560px; padding:16px 18px 6px; background:#fff; }.graph svg { width:100%; height:540px; }.rail { stroke:#d9d2ea; stroke-width:3; }.main-rail { stroke:#5b36d6; }.feature-rail { stroke:#ff5f45; }.node { stroke:#fff; stroke-width:3; }.node.main { fill:#5b36d6; }.node.feature { fill:#ff5f45; }.node.hotfix { fill:#1c9b68; }.graph text { font-size:12px; fill:#4e4955; }.legend { padding:7px 20px 20px; border-top:1px solid var(--line); }.dot { background:#5b36d6; }.dot.feature { background:#ff5f45; }.dot.hotfix { background:#1c9b68; }
+      .theory { grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; }.theory article { border-color:var(--line); border-radius:12px; padding:20px; }.theory h3 { color:var(--violet); }.command { border-radius:8px; }.scenario-layout,.scenario-list,#scenarios { display:none; }
+      @media (max-width: 900px) { .shell { grid-template-columns:70px minmax(0,1fr); }.topbar { height:76px; padding:0 18px; }.brand { font-size:25px; }.safe { font-size:0; }.safe::before { margin:0; }.grid { grid-template-columns:1fr; }.grid > section:first-child { order:1; }.grid > section:nth-child(2) { order:2; }.live-task .task { grid-template-columns:1fr; padding:18px 22px 24px; }.task-status { text-align:left; }.graph { min-height:420px; }.graph svg { height:420px; } main { padding:30px 20px 52px; } }
     </style>
   </head>
   <body>
@@ -120,10 +140,10 @@
       <main>
         <section id="lab" class="view active">
           <div class="crumb">product-ideas / Code / учебная песочница</div>
-          <div class="hero"><div><div class="eyebrow">GIT БЕЗ РИСКА</div><h1>Пойми историю Git<br />на своей практике.</h1><p>Читай задачу, вводи команду сразу в терминал и переходи к следующей ситуации — как на нашем занятии.</p></div><div class="progress"><b id="progressN">0 / 25</b><br /><span>сценариев решено</span><div class="meter"><i id="progressBar"></i></div></div></div>
+          <div class="hero"><div><h1>Практика Git<br />без риска</h1><p>Решай рабочие ситуации в виртуальном терминале и сразу видь, как меняется история веток.</p></div><div class="progress"><b id="progressN">0 / 25</b><br /><span>сценариев решено</span><div class="meter"><i id="progressBar"></i></div></div></div>
           <section class="card live-task" id="liveTask"><div class="card-head"><h2>Текущая задача</h2><div><button class="button" id="taskHelp">Подсказка</button> <span class="label">ОТВЕТЬ В ТЕРМИНАЛЕ НИЖЕ</span></div></div><div class="task"><div class="task-number" id="liveTaskNumber">1</div><div><h2 id="liveTaskTitle"></h2><p id="liveTaskStory"></p><p class="task-context" id="liveTaskContext"></p><div class="goal" id="liveTaskGoal"></div></div><div class="task-status" id="liveTaskStatus">Введи первую команду</div></div></section>
           <div class="grid">
-            <section class="card"><div class="card-head"><h2>Граф истории</h2><span class="label" id="branchLabel">ВЕТКА: feature/payment</span></div><div class="graph"><svg id="graphSvg" viewBox="0 0 700 260" role="img" aria-label="Граф веток Git"></svg></div><div class="legend"><span><i class="dot"></i>main / develop</span><span><i class="dot feature"></i>feature</span><span><i class="dot hotfix"></i>hotfix</span><span>Новые ветки и коммиты появляются после твоих команд</span></div></section>
+            <section class="card"><div class="card-head"><h2>Граф репозитория</h2><span class="label" id="branchLabel">ВЕТКА: feature/payment</span></div><div class="graph"><svg id="graphSvg" viewBox="0 0 700 540" role="img" aria-label="Граф веток Git в стиле GitLab"></svg></div><div class="legend"><span><i class="dot"></i>main / develop</span><span><i class="dot feature"></i>feature</span><span><i class="dot hotfix"></i>hotfix</span><span>Цветные дорожки и точки — ветки и коммиты, как в Repository graph GitLab</span></div></section>
             <section class="card"><div class="card-head"><h2>Состояние репозитория</h2><button class="button" id="reset">Начать заново</button></div><pre class="state" id="state"></pre><div class="terminal"><div class="terminal-head">learner@git-lab:~/product-ideas — виртуальный терминал</div><div class="terminal-out" id="output"><span class="ok">Добро пожаловать в Git Practice Lab.</span>
 Введи <b>help</b>, <b>git status</b> или выполни текущую задачу выше.</div><form class="command-line" id="commandForm"><b>$</b><input id="commandInput" autocomplete="off" spellcheck="false" placeholder="git status" aria-label="Введите команду Git" /><button type="submit" aria-label="Запустить команду">Выполнить ↵</button></form></div><p class="tips"><b>Enter</b> или кнопка «Выполнить» запускают команду · <b>Tab</b> дополняет команды · <b>↑ ↓</b> — история.</p></section>
           </div>
@@ -214,28 +234,37 @@
         'feature/payment': { type: 'feature', from: 'develop', commits: ['Start payment feature'] },
         'hotfix/login': { type: 'hotfix', from: 'main', commits: ['Fix login'] }
       }; }
-      const state = { branch: 'feature/payment', dirty: true, staged: false, remote: false, conflict: '', history: ['Initial commit', 'Create develop', 'Start payment feature'], branches: makeInitialBranches(), done: [], taskStep: 0 };
+      const state = { branch: 'develop', dirty: false, staged: false, remote: true, conflict: '', history: ['Initial commit', 'Create develop'], branches: makeInitialBranches(), done: [], taskStep: 0 };
       const output = document.querySelector('#output'); const input = document.querySelector('#commandInput'); const history = []; let historyIndex = -1; let currentTask = 0;
       const allCommands = ['git status','git add','git commit -m','git push','git pull','git fetch','git merge','git checkout','git switch','git rebase','git revert','git cherry-pick','git branch --show-current','git branch -a','git log','git diff','git restore','help','clear'];
       function say(text, kind='') { const row = document.createElement('div'); row.className = kind; row.textContent = text; output.append(row); output.scrollTop = output.scrollHeight; }
       function escapeSvg(text) { return String(text).replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char])); }
       function branchType(name) { return name === 'main' || name === 'develop' ? 'main' : name.startsWith('hotfix/') ? 'hotfix' : 'feature'; }
       function renderGraph() {
-        const entries = Object.entries(state.branches);
-        const ordered = entries.sort(([a],[b]) => (a === 'main' ? -2 : b === 'main' ? 2 : a === 'develop' ? -1 : b === 'develop' ? 1 : a.localeCompare(b)));
-        const height = Math.max(260, ordered.length * 48 + 44);
-        const rows = Object.fromEntries(ordered.map(([name], index) => [name, 38 + index * 48]));
+        const ordered = Object.entries(state.branches).sort(([a],[b]) => (a === 'main' ? -2 : b === 'main' ? 2 : a === 'develop' ? -1 : b === 'develop' ? 1 : a.localeCompare(b)));
+        const lane = Object.fromEntries(ordered.map(([name], index) => [name, 34 + index * 24]));
+        const rows = ordered.flatMap(([name, data]) => data.commits.slice(-5).reverse().map((message, order) => ({ name, data, message, order })));
+        const height = Math.max(430, rows.length * 52 + 58);
         const svg = document.querySelector('#graphSvg');
-        svg.setAttribute('viewBox', `0 0 700 ${height}`); svg.style.height = `${height}px`;
-        const lines = ordered.map(([name, data]) => {
-          const y = rows[name]; const type = branchType(name); const parentY = data.from && rows[data.from];
-          const connector = parentY ? `<path class="rail" d="M145 ${parentY} C175 ${parentY} 170 ${y} 200 ${y}"/>` : '';
-          const railClass = type === 'main' ? 'main-rail' : type === 'feature' ? 'feature-rail' : '';
-          const commits = data.commits.slice(-6).map((_, index) => `<circle class="node ${type}" cx="${230 + index * 63}" cy="${y}" r="9"/>`).join('');
-          const tip = name === state.branch ? `<text x="620" y="${y + 4}" fill="#6546c9">← сейчас</text>` : '';
-          return `${connector}<text x="12" y="${y + 4}">${escapeSvg(name)}</text><path class="rail ${railClass}" d="M145 ${y} H620"/>${commits}${tip}`;
+        svg.setAttribute('viewBox', `0 0 430 ${height}`); svg.style.height = `${height}px`;
+        const rails = ordered.map(([name, data]) => {
+          const type = branchType(name); const color = type === 'main' ? '#5b36d6' : type === 'hotfix' ? '#1c9b68' : '#ff5f45';
+          return `<path d="M${lane[name]} 24 V${height - 22}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
         }).join('');
-        svg.innerHTML = lines;
+        const emptyHeads = ordered.filter(([, data]) => data.commits.length === 0).map(([name], emptyIndex) => {
+          const x = lane[name]; const type = branchType(name); const color = type === 'main' ? '#5b36d6' : type === 'hotfix' ? '#1c9b68' : '#ff5f45';
+          const labelWidth = Math.min(124, 20 + name.length * 6);
+          const y = height - 34 - emptyIndex * 32;
+          return `<circle cx="${x}" cy="${y}" r="8" fill="#fff" stroke="${color}" stroke-width="3"/><rect x="${x + 18}" y="${y - 13}" width="${labelWidth}" height="25" rx="4" fill="#f4f1ff" stroke="#dfd5ff"/><text x="${x + 26}" y="${y + 4}" fill="#4b2bc0" font-size="10" font-weight="700">${escapeSvg(name)}</text>`;
+        }).join('');
+        const commits = rows.map((row, index) => {
+          const y = 33 + index * 52; const x = lane[row.name]; const type = branchType(row.name); const color = type === 'main' ? '#5b36d6' : type === 'hotfix' ? '#1c9b68' : '#ff5f45';
+          const isHead = row.order === 0; const tag = isHead ? `<rect x="${x + 18}" y="${y - 14}" width="${Math.min(124, 20 + row.name.length * 6)}" height="25" rx="4" fill="#f4f1ff" stroke="#dfd5ff"/><text x="${x + 26}" y="${y + 3}" fill="#4b2bc0" font-size="10" font-weight="700">${escapeSvg(row.name)}</text>` : '';
+          const hash = `a${String(480 + index * 137).padStart(6, '0')}`;
+          const branchJoin = row.data.from && row.order === row.data.commits.length - 1 ? `<path d="M${lane[row.data.from] || x} ${y - 32} C${lane[row.data.from] || x} ${y - 8} ${x} ${y - 14} ${x} ${y}" fill="none" stroke="#bfb7d2" stroke-width="2"/>` : '';
+          return `${branchJoin}<circle cx="${x}" cy="${y}" r="8" fill="${color}" stroke="#fff" stroke-width="3"/><text x="${Math.max(145, x + 145)}" y="${y - 4}" fill="#26222d" font-size="12" font-weight="700">${escapeSvg(row.message)}</text><text x="${Math.max(145, x + 145)}" y="${y + 14}" fill="#8b8493" font-size="9">${hash} · только что</text>${tag}`;
+        }).join('');
+        svg.innerHTML = `${rails}${emptyHeads}${commits}`;
       }
       function render() { document.querySelector('#state').textContent = `On branch ${state.branch}\n${state.conflict ? `You are resolving a ${state.conflict} conflict\nUnmerged paths: index.html` : state.staged ? 'Changes to be committed: index.html' : state.dirty ? 'Changes not staged for commit: index.html' : 'nothing to commit, working tree clean'}\n${state.remote ? `Your branch is up to date with origin/${state.branch}.` : 'No upstream branch configured yet.'}`; document.querySelector('#branchLabel').textContent = `ВЕТКА: ${state.branch}`; const n = state.done.length; ['progressN','scenarioProgress'].forEach(id => document.querySelector('#'+id).textContent = `${n} / 25`); ['progressBar','scenarioBar'].forEach(id => document.querySelector('#'+id).style.width = `${n / 25 * 100}%`); renderGraph(); renderLiveTask(); renderTasks(); }
       function learn(command) { const item = theory.find(x => command.includes(x[0])); return item ? `${item[0]} — ${item[1]}\nПример:\n${item[2]}` : 'Команда пока не нужна для этого урока. Напиши help.'; }
