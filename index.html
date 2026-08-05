@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Git Practice Lab</title>
+    <style>
+      :root {
+        --ink: #20212a;
+        --muted: #73727f;
+        --line: #dedde7;
+        --violet: #6546c9;
+        --violet-soft: #f0edff;
+        --orange: #fc6d26;
+        --green: #188a5a;
+        --bg: #f6f5fb;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; color: var(--ink); background: var(--bg); font: 15px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      button, input { font: inherit; }
+      button { cursor: pointer; }
+      .topbar { height: 58px; background: #2b2b63; display: flex; align-items: center; padding: 0 24px; color: white; gap: 18px; }
+      .brand { font-size: 19px; font-weight: 850; letter-spacing: -.03em; white-space: nowrap; }
+      .brand b { color: var(--orange); }
+      .search { width: min(480px, 42vw); margin: auto; border: 1px solid #8888aa; border-radius: 8px; color: #e8e8f3; padding: 7px 11px; background: #404078; }
+      .safe { padding: 5px 10px; border: 1px solid #48926d; border-radius: 999px; color: #c9ffe3; font-size: 12px; }
+      .shell { min-height: calc(100vh - 58px); display: grid; grid-template-columns: 255px minmax(0, 1fr); }
+      .side { padding: 20px 12px; border-right: 1px solid var(--line); background: #fcfcff; }
+      .project { padding: 13px; border: 1px solid var(--line); border-radius: 9px; margin-bottom: 18px; background: white; }
+      .project small, .eyebrow { color: var(--muted); font-size: 11px; letter-spacing: .08em; font-weight: 750; }
+      .project h2 { margin: 3px 0; font-size: 17px; }
+      .nav { display: grid; gap: 4px; }
+      .nav button { text-align: left; border: 0; color: #494855; background: transparent; border-radius: 7px; padding: 10px 11px; }
+      .nav button:hover, .nav button.active { color: #402994; background: var(--violet-soft); font-weight: 700; }
+      .side-note { position: sticky; top: 15px; margin-top: 28px; padding: 13px; border-radius: 9px; color: #285541; background: #edfff5; border: 1px solid #bce7cc; font-size: 12px; }
+      main { padding: 28px clamp(18px, 4vw, 54px) 52px; max-width: 1540px; width: 100%; }
+      .view { display: none; }
+      .view.active { display: block; }
+      .crumb { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+      .hero { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 22px; }
+      h1 { font-size: clamp(28px, 4vw, 43px); line-height: 1.05; letter-spacing: -.055em; margin: 4px 0 10px; }
+      .hero p { margin: 0; max-width: 690px; color: var(--muted); }
+      .progress { min-width: 155px; }
+      .progress b { font-size: 20px; }
+      .progress span { color: var(--muted); font-size: 12px; }
+      .meter { height: 7px; overflow: hidden; margin-top: 7px; border-radius: 20px; background: #e4e1ed; }
+      .meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--violet), var(--orange)); transition: .25s; }
+      .live-task { margin-bottom: 18px; border-color: #cfc3f5; }
+      .live-task .task { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 14px; padding: 16px 18px; }
+      .task-number { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; color: white; background: linear-gradient(135deg, var(--violet), #9475ec); font: 800 15px ui-monospace, monospace; }
+      .live-task h2 { margin: 1px 0 4px; font-size: 17px; }.live-task p { margin: 0; color: var(--muted); font-size: 13px; }.live-task .task-context { margin-top: 9px; color: #504d5c; line-height: 1.55; }
+      .live-task .goal { margin-top: 8px; padding: 8px 10px; font-size: 13px; }
+      .task-status { min-width: 120px; color: #6a6875; font-size: 12px; text-align: right; }
+      .grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr); gap: 18px; }
+      .card { border: 1px solid var(--line); border-radius: 11px; background: white; overflow: hidden; }
+      .card-head { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 17px; border-bottom: 1px solid var(--line); background: #fdfdff; }
+      .card h2, .card h3 { margin: 0; font-size: 16px; }
+      .label { font-size: 10px; color: #644bb4; background: var(--violet-soft); padding: 4px 7px; border-radius: 5px; letter-spacing: .08em; font-weight: 800; }
+      .graph { padding: 18px 20px 4px; min-height: 300px; background: radial-gradient(circle at 70% 5%, #f1edff 0, transparent 42%); }
+      svg { width: 100%; height: 260px; overflow: visible; }
+      .rail { fill: none; stroke: #bdc0cb; stroke-width: 3; }
+      .main-rail { stroke: var(--violet); }
+      .feature-rail { stroke: var(--orange); }
+      .node { stroke: white; stroke-width: 3; }
+      .node.main { fill: var(--violet); }
+      .node.feature { fill: var(--orange); }
+      .node.hotfix { fill: var(--green); }
+      .graph text { fill: #4f4c5b; font-size: 12px; font-weight: 700; }
+      .legend { padding: 0 17px 15px; display: flex; flex-wrap: wrap; gap: 13px; color: var(--muted); font-size: 12px; }
+      .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; background: var(--violet); }
+      .dot.feature { background: var(--orange); }.dot.hotfix { background: var(--green); }
+      .state { margin: 0; min-height: 150px; padding: 16px 18px; white-space: pre-wrap; color: #4f4767; font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .terminal { margin: 0 17px 17px; overflow: hidden; border-radius: 9px; background: #20212a; color: #e9ebf0; font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .terminal-head { padding: 9px 12px; color: #c1bed0; border-bottom: 1px solid #444553; }
+      .terminal-out { height: 210px; overflow: auto; padding: 12px; white-space: pre-wrap; }
+      .ok { color: #83e0ae; }.error { color: #ff9ca7; }.hint { color: #b9b5d3; }
+      .command-line { display: flex; gap: 8px; padding: 10px 12px; color: #8fe0b3; border-top: 1px solid #444553; }
+      .command-line input { flex: 1; min-width: 0; color: white; background: transparent; border: 0; outline: 0; }
+      .command-line button { border: 0; border-radius: 5px; padding: 5px 10px; color: #d9ffe7; background: #3e6d55; font-weight: 800; }
+      .tips { padding: 0 17px 17px; color: var(--muted); font-size: 12px; }
+      code { padding: 2px 5px; border-radius: 4px; color: #563bb3; background: #f0edfb; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .command { display: block; white-space: pre-wrap; padding: 10px; color: #c9f5d8; background: #23232b; border-radius: 7px; font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .theory { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; }
+      .theory article { border: 1px solid var(--line); background: white; border-radius: 10px; padding: 16px; }
+      .theory h3 { margin: 0 0 8px; font: 800 16px ui-monospace, monospace; color: #4c34a0; }
+      .theory p { color: #5c5b66; min-height: 65px; margin: 0 0 11px; }
+      .theory small { display: block; margin-top: 9px; color: var(--muted); }
+      .scenario-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; }
+      .scenario-list { display: grid; gap: 9px; }
+      .scenario { width: 100%; padding: 14px 15px; text-align: left; border: 1px solid var(--line); border-radius: 8px; background: white; }
+      .scenario:hover, .scenario.active { border-color: #9a86df; background: #faf9ff; }
+      .scenario.done { border-color: #78c99e; background: #f2fff7; }
+      .scenario b { display: block; margin-bottom: 3px; }.scenario span { color: var(--muted); font-size: 13px; }
+      .task { padding: 20px; }.task h2 { margin: 8px 0; font-size: 23px; }.task p { color: #565560; }
+      .goal { padding: 12px 14px; border-left: 4px solid var(--orange); background: #fff8ea; border-radius: 4px; color: #5e4b2a; }
+      .button { border: 1px solid #bcb8cf; border-radius: 7px; color: #403d4c; background: white; padding: 8px 11px; font-weight: 700; }
+      .button.primary { color: white; border-color: var(--violet); background: var(--violet); }.button:hover { filter: brightness(.96); }
+      .answer { display: none; margin-top: 15px; }.answer.show { display: block; }
+      .sticky { position: sticky; top: 18px; height: max-content; }
+      .notice { padding: 12px; border: 1px solid #f0d899; border-radius: 8px; color: #725823; background: #fffbe9; font-size: 13px; }
+      @media (max-width: 900px) { .shell { grid-template-columns: 1fr; }.side { position: static; border-right: 0; border-bottom: 1px solid var(--line); }.nav { grid-template-columns: repeat(3, 1fr); }.side-note { display: none; }.grid, .scenario-layout { grid-template-columns: 1fr; }.hero { align-items: start; flex-direction: column; }.search { display: none; }.live-task .task { grid-template-columns: 48px 1fr; }.task-status { grid-column: 2; text-align: left; } }
+      @media (max-width: 560px) { main { padding: 20px 14px; }.topbar { padding: 0 14px; }.safe { display: none; }.nav { overflow: auto; display: flex; }.nav button { white-space: nowrap; }.graph { padding-inline: 8px; } }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand"><b>◆</b> Git Practice Lab</div>
+      <input class="search" placeholder="Учебный проект · product-ideas" aria-label="Поиск" />
+      <div class="safe">✓ Безопасная виртуальная история</div>
+    </header>
+    <div class="shell">
+      <aside class="side">
+        <section class="project"><small>ТВОЙ УЧЕБНЫЙ ПРОЕКТ</small><h2>product-ideas</h2><small>Команды не затрагивают Git, GitLab или файлы компьютера.</small></section>
+        <nav class="nav" aria-label="Разделы тренажёра">
+          <button class="active" data-view="lab">⌘ Виртуальный терминал</button>
+          <button data-view="theory">▤ Теория и примеры</button>
+        </nav>
+        <div class="side-note"><b>Как думать перед командой</b><br />1. На какой я ветке?<br />2. Где нужное изменение?<br />3. Что именно хочу перенести или отменить?</div>
+      </aside>
+      <main>
+        <section id="lab" class="view active">
+          <div class="crumb">product-ideas / Code / учебная песочница</div>
+          <div class="hero"><div><div class="eyebrow">GIT БЕЗ РИСКА</div><h1>Пойми историю Git<br />на своей практике.</h1><p>Читай задачу, вводи команду сразу в терминал и переходи к следующей ситуации — как на нашем занятии.</p></div><div class="progress"><b id="progressN">0 / 25</b><br /><span>сценариев решено</span><div class="meter"><i id="progressBar"></i></div></div></div>
+          <section class="card live-task" id="liveTask"><div class="card-head"><h2>Текущая задача</h2><div><button class="button" id="taskHelp">Подсказка</button> <span class="label">ОТВЕТЬ В ТЕРМИНАЛЕ НИЖЕ</span></div></div><div class="task"><div class="task-number" id="liveTaskNumber">1</div><div><h2 id="liveTaskTitle"></h2><p id="liveTaskStory"></p><p class="task-context" id="liveTaskContext"></p><div class="goal" id="liveTaskGoal"></div></div><div class="task-status" id="liveTaskStatus">Введи первую команду</div></div></section>
+          <div class="grid">
+            <section class="card"><div class="card-head"><h2>Граф истории</h2><span class="label" id="branchLabel">ВЕТКА: feature/payment</span></div><div class="graph"><svg id="graphSvg" viewBox="0 0 700 260" role="img" aria-label="Граф веток Git"></svg></div><div class="legend"><span><i class="dot"></i>main / develop</span><span><i class="dot feature"></i>feature</span><span><i class="dot hotfix"></i>hotfix</span><span>Новые ветки и коммиты появляются после твоих команд</span></div></section>
+            <section class="card"><div class="card-head"><h2>Состояние репозитория</h2><button class="button" id="reset">Начать заново</button></div><pre class="state" id="state"></pre><div class="terminal"><div class="terminal-head">learner@git-lab:~/product-ideas — виртуальный терминал</div><div class="terminal-out" id="output"><span class="ok">Добро пожаловать в Git Practice Lab.</span>
+Введи <b>help</b>, <b>git status</b> или выполни текущую задачу выше.</div><form class="command-line" id="commandForm"><b>$</b><input id="commandInput" autocomplete="off" spellcheck="false" placeholder="git status" aria-label="Введите команду Git" /><button type="submit" aria-label="Запустить команду">Выполнить ↵</button></form></div><p class="tips"><b>Enter</b> или кнопка «Выполнить» запускают команду · <b>Tab</b> дополняет команды · <b>↑ ↓</b> — история.</p></section>
+          </div>
+        </section>
+        <section id="theory" class="view"><div class="crumb">product-ideas / теория</div><div class="hero"><div><div class="eyebrow">НЕ ЗУБРИМ · ПОНИМАЕМ</div><h1>Что делает<br />каждая команда?</h1><p>Открывай карточку перед практикой: зачем нужна команда, пример и частая ошибка.</p></div></div><div class="theory" id="theoryGrid"></div></section>
+        <section id="scenarios" class="view"><div class="crumb">product-ideas / домашнее задание</div><div class="hero"><div><div class="eyebrow">СЦЕНАРИИ ИЗ РАБОТЫ</div><h1>25 задач<br />без опасных последствий.</h1><p>Выбери ситуацию, подумай, введи команды в виртуальном терминале и сверь ход мысли.</p></div><div class="progress"><b id="scenarioProgress">0 / 25</b><br /><span>решено</span><div class="meter"><i id="scenarioBar"></i></div></div></div><div class="scenario-layout"><section class="card task"><span class="label" id="taskNum">СЦЕНАРИЙ 1</span><h2 id="taskTitle"></h2><p id="taskStory"></p><div class="goal" id="taskGoal"></div><div class="answer" id="answer"><b>Ход мысли и пример:</b><pre class="command" id="answerCode"></pre><p id="answerText"></p></div><p><button class="button primary" id="showAnswer">Показать решение</button> <button class="button" id="nextTask">Следующий сценарий →</button></p></section><aside class="sticky"><div class="notice"><b>Важно</b><br />Сценарий не требует слепо повторять ответ. Сначала назови себе текущую ветку, цель и риск.</div><div class="card" style="margin-top:14px"><div class="card-head"><h3>Статусы в VS Code</h3></div><div style="padding:15px"><p><code>M</code> — изменённый файл</p><p><code>U</code> — новый, Git ещё не отслеживает</p><p><code>A</code> — добавлен в staging</p><p><code>D</code> — удалён</p></div></div></aside></div><div class="scenario-list" id="scenarioList" style="margin-top:18px"></div></section>
+      </main>
+    </div>
+    <script>
+      const theory = [
+        ['git status', 'Показывает текущую ветку, изменённые файлы и состояние staging. Это первая команда, когда непонятно, что происходит.', 'git status', 'Ничего не меняет — только показывает состояние.'],
+        ['git add', 'Выбирает текущую версию файла для следующего коммита. Не создаёт файл и не отправляет его в GitLab.', 'git add index.html', 'Повторяй git add после каждой новой правки файла.'],
+        ['git commit', 'Сохраняет выбранные изменения в локальную историю Git. Перед ним обычно нужен git add.', 'git add index.html\ngit commit -m "Update welcome"', 'Коммит ещё не отправляет код в GitLab.'],
+        ['git branch --show-current', 'Показывает только название текущей ветки — без длинного списка и лишней информации.', 'git branch --show-current', 'Тот же ответ есть в первой строке git status.'],
+        ['git branch -a', 'Показывает локальные ветки и известные удалённые ветки GitLab.', 'git branch -a', 'Строки origin/… — это ветки на удалённом сервере.'],
+        ['git switch', 'Переключает рабочую папку на уже существующую ветку.', 'git switch develop', 'Команда не создаёт новую ветку без опции -c.'],
+        ['git switch -c', 'Создаёт новую ветку от текущей точки и сразу переключает в неё.', 'git switch -c feature/profile', '-c означает create. Используй для отдельной задачи.'],
+        ['git push', 'Отправляет локальные коммиты текущей ветки в связанную ветку GitLab.', 'git push\n# первый раз: git push -u origin HEAD', 'Push отправляет коммиты, а не просто несохранённый файл.'],
+        ['git pull', 'Забирает изменения из GitLab в текущую локальную ветку. Это fetch + merge.', 'git switch develop\ngit pull', 'Перед началом работы полезно проверить, что ветка актуальна.'],
+        ['git fetch', 'Обновляет сведения о ветках на сервере, но не меняет твои файлы и текущую ветку.', 'git fetch origin', 'Подходит, если хочешь сначала посмотреть изменения коллеги.'],
+        ['git merge', 'Объединяет историю одной ветки с текущей. В командах это часто происходит через Merge Request.', 'git switch develop\ngit merge feature/profile', 'Merge может потребовать вручную решить конфликт.'],
+        ['git checkout', 'Старая команда для перехода между ветками или создания ветки. Сейчас чаще используют git switch.', 'git checkout develop\n# новая ветка: git checkout -b feature/profile', 'Не путай переход git checkout develop и создание git checkout -b …'],
+        ['git log', 'Показывает историю коммитов и их хеши. Нужна, чтобы найти коммит для revert или cherry-pick.', 'git log', 'Для переноса часто достаточно короткого хеша в начале строки.'],
+        ['git diff', 'Показывает, что именно изменилось в ещё не закоммиченных файлах.', 'git diff', 'Безопасная команда: она ничего не меняет.'],
+        ['git restore', 'Отменяет локальные правки файла, которые ещё не попали в коммит.', 'git restore index.html', 'Осторожно: несохранённые в коммите изменения файла пропадут.'],
+        ['git restore --staged', 'Убирает файл из staging, но оставляет саму правку в рабочей папке.', 'git restore --staged index.html', 'Полезно, если случайно добавила не тот файл в будущий коммит.'],
+        ['git rebase', 'Переносит коммиты текущей ветки поверх свежей базы, например поверх main.', 'git switch feature/profile\ngit rebase main', 'После уже опубликованной общей ветки rebase используют осторожно.'],
+        ['git revert', 'Безопасно отменяет опубликованный коммит: создаёт новый коммит с обратными изменениями.', 'git revert a4b5c6d', 'Для main обычно безопаснее revert, чем reset.'],
+        ['git cherry-pick', 'Берёт один конкретный коммит из другой ветки и применяет его в текущей.', 'git switch develop\ngit cherry-pick 9ab12cd', 'Это не merge: переносится один коммит, а не вся ветка.']
+      ];
+      const scenarios = [
+        ['Новая фича', 'Ты в develop и начинаешь отдельную задачу «профиль пользователя».', 'Создай ветку для фичи.', 'git switch -c feature/profile', 'Ветка отделяет твою работу от develop.'],
+        ['Сохранить правку', 'Ты изменила index.html, в VS Code рядом с ним M.', 'Сохрани это изменение в локальной истории.', 'git add index.html\ngit commit -m "Update index"', 'Сначала выбираем новую версию файла, затем создаём коммит.'],
+        ['Первый push', 'В новой ветке есть готовый коммит, но ты не помнишь название ветки.', 'Отправь текущую ветку и свяжи её с GitLab.', 'git push -u origin HEAD', 'HEAD означает текущую ветку. Потом хватит git push.'],
+        ['Забрать main', 'Коллега влил изменения в main, ты хочешь начать от свежей версии.', 'Перейди в main и забери изменения.', 'git switch main\ngit pull', 'Сначала выбираем нужную ветку, затем обновляем её.'],
+        ['Только посмотреть', 'Ты слышала, что коллега создал новую ветку, но свои файлы менять не хочешь.', 'Обнови сведения об удалённом репозитории.', 'git fetch origin', 'fetch ничего не вливает и не меняет твою ветку.'],
+        ['Предложить слияние', 'Фича готова и отправлена в GitLab.', 'Что происходит дальше?', 'git push\n# затем Merge Request: feature/profile → develop', 'Merge Request создаётся в GitLab, это не команда Git.'],
+        ['Слить фичу локально', 'Ты в develop и хочешь объединить готовую feature/profile.', 'Выполни локальное слияние.', 'git merge feature/profile', 'В командах Git это merge; в команде часто используют MR.'],
+        ['Срочный фикс', 'В hotfix/login есть коммит 9ab12cd с исправлением входа. Ты уже в develop.', 'Перенеси только этот фикс.', 'git cherry-pick 9ab12cd', 'Cherry-pick переносит один коммит, не всю ветку.'],
+        ['Упал прод', 'Коммит a4b5c6d уже в main и сломал оплату.', 'Безопасно отмени опубликованный коммит.', 'git revert a4b5c6d', 'Revert создаёт обратный коммит и не переписывает историю.'],
+        ['Отстала feature', 'Ты работаешь в feature/profile, пока main заметно обновился.', 'Положи свои коммиты поверх свежего main.', 'git rebase main', 'Перед rebase сначала стоит получить свежий main.'],
+        ['Конфликт при rebase', 'Git остановился из-за конфликта во время rebase.', 'Как продолжить после ручного исправления файла?', 'git add index.html\ngit rebase --continue', 'git status сначала подскажет конфликтные файлы.'],
+        ['Отказ от rebase', 'Ты увидела, что rebase сейчас не нужен, конфликт ещё не решала.', 'Отмени начатый rebase.', 'git rebase --abort', 'Abort возвращает состояние до операции.'],
+        ['Конфликт cherry-pick', 'При переносе коммита возник конфликт.', 'Продолжи после исправления конфликтного файла.', 'git add index.html\ngit cherry-pick --continue', 'Не повторяй git cherry-pick <хеш> заново.'],
+        ['Отказ от cherry-pick', 'Выяснилось, что этот конкретный фикс переносить не надо.', 'Вернись к состоянию до операции.', 'git cherry-pick --abort', 'Abort отменяет незавершённый перенос.'],
+        ['Проверка контекста', 'Ты не уверена, где находишься и есть ли незакоммиченные изменения.', 'Безопасно проверь состояние.', 'git status', 'Это хорошая первая команда, когда контекст потерян.'],
+        ['Перейти старой командой', 'В инструкции команды написано переключиться на develop через checkout.', 'Выполни переход.', 'git checkout develop', 'git switch develop — современный более понятный вариант.'],
+        ['Создать старой командой', 'Старая инструкция просит создать feature/search.', 'Выполни команду.', 'git checkout -b feature/search', '-b означает создать новую ветку.'],
+        ['Новый файл', 'В VS Code у notes.md стоит U.', 'Добавь его в следующий коммит.', 'git add notes.md', 'U значит Untracked: Git пока не знает о файле.'],
+        ['Проверить список веток', 'Нужно увидеть локальные и удалённые ветки.', 'Выведи список.', 'git branch -a', 'origin/… — записи об удалённых ветках.'],
+        ['Найти коммит', 'Тебе нужен хеш старого исправления, чтобы сделать cherry-pick.', 'Посмотри историю.', 'git log', 'В истории есть сообщения и идентификаторы коммитов.'],
+        ['Незавершённый merge', 'Git сообщает конфликт во время merge.', 'Что сделать после ручного исправления?', 'git add index.html\ngit merge --continue', 'Иногда Git завершит merge обычным git commit.'],
+        ['Push после коммита', 'Ты сделала новый коммит в уже связанной feature-ветке.', 'Отправь его в GitLab.', 'git push', 'Имя ветки уже запомнено связью upstream.'],
+        ['Нельзя сделать pull', 'В текущей ветке есть незакоммиченные изменения, которые Git может перезаписать.', 'Какой безопасный первый шаг?', 'git status\n# затем сохранить изменения: git add … и git commit', 'Не делай pull вслепую: сначала сохрани или убери свои изменения.'],
+        ['Сравнить правки', 'Перед откатом хочешь посмотреть, что изменилось локально.', 'Покажи разницу.', 'git diff', 'Diff ничего не меняет, только показывает.'],
+        ['Путь к релизу', 'Фича готова, проверена и нужно довести её до пользователей.', 'Назови поток веток.', 'feature/… → Merge Request → develop → проверка → Merge Request → main', 'В этом тренажёре main — финальная общая ветка.']
+      ];
+      const scenarioContext = [
+        'В develop уже лежит проверенная командная работа. Твоя новая задача не должна смешиваться с ней до проверки, поэтому начинаем с отдельной ветки.',
+        'Правка уже сделана в VS Code, но Git пока видит её только как M — modified. Сначала выбери версию файла для коммита, потом зафиксируй понятную точку в истории.',
+        'Коммит уже есть только на твоём компьютере. Пока он не попадёт в GitLab, коллеги не увидят его, а Merge Request создать будет не из чего.',
+        'Тебе нужно не просто увидеть свежую версию main в GitLab, а привести в соответствие свою локальную ветку main, чтобы начать работу от актуальной основы.',
+        'Ты не хочешь рисковать своими незакоммиченными правками. Поэтому сначала обновляешь только сведения о сервере — без слияния и без изменения файлов.',
+        'Код уже отправлен в GitLab. Теперь важно не вливать его молча: команде нужен просмотр изменений, обсуждение и явное решение, куда вливать фичу.',
+        'Это учебный вариант операции, которую в команде обычно делает GitLab после Merge Request. Ты находишься в целевой ветке develop, поэтому именно туда придут изменения.',
+        'Прод внезапно ломает вход. Полностью вливать hotfix-ветку в develop долго, но один готовый коммит с исправлением можно перенести адресно.',
+        'Проблемный коммит уже опубликован и мог попасть к пользователям. Не переписываем общую историю: создаём новый коммит, который аккуратно отменит последствия.',
+        'Пока ты делала фичу, main ушёл вперёд. Rebase помогает проверить, применятся ли твои изменения поверх новой базы, до того как откроешь Merge Request.',
+        'Git не может сам выбрать итоговый текст в конфликтном месте. Ты уже выбрала правильный вариант в редакторе; теперь нужно отметить файл как решённый и продолжить операцию.',
+        'Конфликт оказался сигналом, что обновление базы сейчас преждевременно. Вместо случайных действий возвращаем ветку к состоянию до начала rebase.',
+        'Cherry-pick остановился на конфликте: один коммит переносится в твою ветку, но Git не понимает, какую версию строки оставить. Сначала решаем файл, затем продолжаем именно перенос.',
+        'В ходе проверки выяснилось, что исправление не подходит для этой ветки. Операцию нужно отменить целиком, пока она ещё не завершилась.',
+        'Контекст потерян: после нескольких переключений веток не стоит догадываться. Начни с безопасного просмотра состояния — эта команда ничего не меняет.',
+        'В старом проекте или документации можно встретить checkout. Он делает то же переключение, что современный switch, только у него больше обязанностей и поэтому он менее понятен новичкам.',
+        'Старый синтаксис тоже встречается в инструкциях. Здесь важно увидеть опцию -b: без неё checkout только переключил бы существующую ветку.',
+        'Файл уже существует на компьютере, но Git его ещё не отслеживает. Метка U означает untracked — сначала нужно сказать Git начать следить за ним.',
+        'Перед выбором ветки для Merge Request полезно увидеть всю картину: что есть локально и какие ветки уже известны на сервере.',
+        'Для cherry-pick и revert нужен идентификатор конкретного коммита. Его не придумывают: сначала смотрят историю и копируют хеш нужного изменения.',
+        'Во время merge два изменения затронули одно место. После ручного выбора итогового кода Git должен узнать, что конфликт решён и операцию можно завершить.',
+        'Эта ветка уже была отправлена хотя бы раз, поэтому связь с origin сохранена. Повторно писать длинную команду с названием ветки не требуется.',
+        'Pull может перезаписать твои локальные правки. Сперва разбираемся, что именно не сохранено, и только потом решаем: коммитить, stash-ить или отменять правку.',
+        'Перед опасным действием полезно посмотреть именно разницу в файлах. Diff ничего не меняет и помогает принять решение до revert или restore.',
+        'Релиз — не один клик и не один push. Фича проходит проверку в develop и лишь затем предлагается к слиянию в main — общую финальную ветку.'
+      ];
+      function makeInitialBranches() { return {
+        main: { type: 'main', from: null, commits: ['Initial commit', 'Release baseline'] },
+        develop: { type: 'develop', from: 'main', commits: ['Create develop'] },
+        'feature/payment': { type: 'feature', from: 'develop', commits: ['Start payment feature'] },
+        'hotfix/login': { type: 'hotfix', from: 'main', commits: ['Fix login'] }
+      }; }
+      const state = { branch: 'feature/payment', dirty: true, staged: false, remote: false, conflict: '', history: ['Initial commit', 'Create develop', 'Start payment feature'], branches: makeInitialBranches(), done: [], taskStep: 0 };
+      const output = document.querySelector('#output'); const input = document.querySelector('#commandInput'); const history = []; let historyIndex = -1; let currentTask = 0;
+      const allCommands = ['git status','git add','git commit -m','git push','git pull','git fetch','git merge','git checkout','git switch','git rebase','git revert','git cherry-pick','git branch --show-current','git branch -a','git log','git diff','git restore','help','clear'];
+      function say(text, kind='') { const row = document.createElement('div'); row.className = kind; row.textContent = text; output.append(row); output.scrollTop = output.scrollHeight; }
+      function escapeSvg(text) { return String(text).replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char])); }
+      function branchType(name) { return name === 'main' || name === 'develop' ? 'main' : name.startsWith('hotfix/') ? 'hotfix' : 'feature'; }
+      function renderGraph() {
+        const entries = Object.entries(state.branches);
+        const ordered = entries.sort(([a],[b]) => (a === 'main' ? -2 : b === 'main' ? 2 : a === 'develop' ? -1 : b === 'develop' ? 1 : a.localeCompare(b)));
+        const height = Math.max(260, ordered.length * 48 + 44);
+        const rows = Object.fromEntries(ordered.map(([name], index) => [name, 38 + index * 48]));
+        const svg = document.querySelector('#graphSvg');
+        svg.setAttribute('viewBox', `0 0 700 ${height}`); svg.style.height = `${height}px`;
+        const lines = ordered.map(([name, data]) => {
+          const y = rows[name]; const type = branchType(name); const parentY = data.from && rows[data.from];
+          const connector = parentY ? `<path class="rail" d="M145 ${parentY} C175 ${parentY} 170 ${y} 200 ${y}"/>` : '';
+          const railClass = type === 'main' ? 'main-rail' : type === 'feature' ? 'feature-rail' : '';
+          const commits = data.commits.slice(-6).map((_, index) => `<circle class="node ${type}" cx="${230 + index * 63}" cy="${y}" r="9"/>`).join('');
+          const tip = name === state.branch ? `<text x="620" y="${y + 4}" fill="#6546c9">← сейчас</text>` : '';
+          return `${connector}<text x="12" y="${y + 4}">${escapeSvg(name)}</text><path class="rail ${railClass}" d="M145 ${y} H620"/>${commits}${tip}`;
+        }).join('');
+        svg.innerHTML = lines;
+      }
+      function render() { document.querySelector('#state').textContent = `On branch ${state.branch}\n${state.conflict ? `You are resolving a ${state.conflict} conflict\nUnmerged paths: index.html` : state.staged ? 'Changes to be committed: index.html' : state.dirty ? 'Changes not staged for commit: index.html' : 'nothing to commit, working tree clean'}\n${state.remote ? `Your branch is up to date with origin/${state.branch}.` : 'No upstream branch configured yet.'}`; document.querySelector('#branchLabel').textContent = `ВЕТКА: ${state.branch}`; const n = state.done.length; ['progressN','scenarioProgress'].forEach(id => document.querySelector('#'+id).textContent = `${n} / 25`); ['progressBar','scenarioBar'].forEach(id => document.querySelector('#'+id).style.width = `${n / 25 * 100}%`); renderGraph(); renderLiveTask(); renderTasks(); }
+      function learn(command) { const item = theory.find(x => command.includes(x[0])); return item ? `${item[0]} — ${item[1]}\nПример:\n${item[2]}` : 'Команда пока не нужна для этого урока. Напиши help.'; }
+      function completeCurrent() { if (!state.done.includes(currentTask)) state.done.push(currentTask); say('✓ Верно! Следующая задача уже открыта выше.', 'ok'); currentTask = (currentTask + 1) % scenarios.length; state.taskStep = 0; }
+      function command(raw) { const value = raw.trim(); if (!value) return; history.push(value); historyIndex = -1; say(`$ ${value}`); const clean = value.replace(/\s+/g, ' ');
+        if (clean === 'clear') { output.innerHTML = ''; input.value = ''; return; }
+        if (clean === 'help') { showTaskHelp(); }
+        else if (clean === 'git status') say(document.querySelector('#state').textContent, 'ok');
+        else if (clean === 'git branch --show-current') say(state.branch, 'ok');
+        else if (clean.startsWith('git switch -c ') || clean.startsWith('git checkout -b ')) { if (!/^git (switch -c|checkout -b) [^\s]+$/.test(clean)) say('Ошибка в имени ветки: в нём не должно быть пробелов. Используй дефис, например feature/profile-user.', 'error'); else { const nextBranch = clean.split(' ').at(-1); if (state.branches[nextBranch]) say(`fatal: a branch named '${nextBranch}' already exists`, 'error'); else { state.branches[nextBranch] = { type: branchType(nextBranch), from: state.branch, commits: [] }; state.branch = nextBranch; state.dirty = false; state.staged = false; state.remote = false; say(`Switched to a new branch '${state.branch}'\nВиртуальный граф обновлён.`, 'ok'); } } }
+        else if (clean.startsWith('git switch ') || clean.startsWith('git checkout ')) { const nextBranch = clean.split(' ').at(-1); if (!state.branches[nextBranch]) say(`error: pathspec '${nextBranch}' did not match any virtual branch`, 'error'); else { state.branch = nextBranch; say(`Switched to branch '${state.branch}'`, 'ok'); } }
+        else if (clean === 'git branch -a') say(`${Object.keys(state.branches).map(name => `${name === state.branch ? '* ' : '  '}${name}\n  remotes/origin/${name}`).join('\n')}`, 'ok');
+        else if (clean.startsWith('git add')) { state.staged = true; say('Changes added to staging area.', 'ok'); }
+        else if (clean.startsWith('git commit')) { if (!state.staged) say('nothing added to commit (use "git add")', 'error'); else { state.staged = false; state.dirty = false; const message = clean.match(/"(.*?)"/)?.[1] || 'Virtual commit'; state.history.push(message); state.branches[state.branch].commits.push(message); say(`[${state.branch} virtual] ${message}\nНовый коммит появился на графе.`, 'ok'); } }
+        else if (clean.startsWith('git push')) { state.remote = true; say(`To origin/${state.branch}\nVirtual branch pushed successfully.`, 'ok'); }
+        else if (clean.startsWith('git fetch')) say('From origin\n * [new branch] feature/colleague\n * [new branch] hotfix/login', 'ok');
+        else if (clean.startsWith('git pull')) { if (state.dirty) say('error: Your local changes to index.html would be overwritten by merge. Commit or stash them before you merge.', 'error'); else say('Already up to date. (virtual remote)', 'ok'); }
+        else if (clean.startsWith('git merge ')) { if (clean.includes('--continue')) { state.conflict = ''; state.branches[state.branch].commits.push('Resolve merge conflict'); say('Merge completed.', 'ok'); } else { const message = `Merge ${clean.split(' ').at(-1)}`; state.history.push(message); state.branches[state.branch].commits.push(message); say('Merge made by the virtual recursive strategy. Граф обновлён.', 'ok'); } }
+        else if (clean.startsWith('git rebase ')) { if (clean.includes('--continue')) { state.conflict = ''; say(`Successfully rebased and updated ${state.branch}.`, 'ok'); } else if (clean.includes('--abort')) { state.conflict = ''; say('Rebase aborted.', 'ok'); } else say(`Successfully rebased and updated ${state.branch}.`, 'ok'); }
+        else if (clean.startsWith('git cherry-pick ')) { if (clean.includes('--continue')) { state.conflict = ''; state.branches[state.branch].commits.push('Cherry-pick resolved'); say(`[${state.branch} virtual] Cherry-pick completed.`, 'ok'); } else if (clean.includes('--abort')) { state.conflict = ''; say('Cherry-pick aborted.', 'ok'); } else { const message = `Cherry-pick ${clean.split(' ').at(-1)}`; state.history.push(message); state.branches[state.branch].commits.push(message); say(`[${state.branch} virtual] Fix transferred from another branch.`, 'ok'); } }
+        else if (clean.startsWith('git revert ')) { const message = `Revert ${clean.split(' ').at(-1)}`; state.history.push(message); state.branches[state.branch].commits.push(message); say(`[${state.branch} virtual] Revert completed.`, 'ok'); }
+        else if (clean === 'git log') say(state.history.slice().reverse().map((x,i) => `commit virtual${i}\n    ${x}`).join('\n\n'), 'ok');
+        else if (clean === 'git diff') say('diff --git a/index.html b/index.html\n+ Updated virtual content', 'ok');
+        else if (clean.startsWith('git restore --staged')) { state.staged = false; state.dirty = true; say('Removed from staging; file changes are kept.', 'ok'); }
+        else if (clean.startsWith('git restore ')) { state.dirty = false; say('Local virtual changes discarded.', 'ok'); }
+        else say(learn(clean), 'hint');
+        const expected = scenarios[currentTask][3].split('\n').filter(x => x.startsWith('git ')); const required = expected[state.taskStep]; if (matchesTaskStep(clean, required)) { state.taskStep++; if (state.taskStep === expected.length) completeCurrent(); else say(`Верно. Остался шаг ${state.taskStep + 1} из ${expected.length}.`, 'ok'); } else if (required) say(taskError(required), 'error'); input.value = ''; render(); }
+      function matchesTaskStep(command, required) {
+        if (!required) return false;
+        if (required.startsWith('git switch -c feature/')) return /^git switch -c feature\/[A-Za-z0-9._-]+$/.test(command);
+        if (required.startsWith('git checkout -b feature/')) return /^git checkout -b feature\/[A-Za-z0-9._-]+$/.test(command);
+        if (required.startsWith('git add ')) return /^git add [^\s]+$/.test(command);
+        if (required.startsWith('git commit -m ')) return /^git commit -m ["'][^"']+["']$/.test(command);
+        if (required === 'git push -u origin HEAD') return /^git push -u origin (HEAD|[^\s]+)$/.test(command);
+        if (required === 'git cherry-pick --continue' || required === 'git cherry-pick --abort') return command === required;
+        if (required.startsWith('git cherry-pick ') || required.startsWith('git revert ')) return /^(git cherry-pick|git revert) [A-Za-z0-9]+$/.test(command);
+        return command === required;
+      }
+      function taskError(required) {
+        if (required.startsWith('git switch -c feature/')) return 'Сейчас нужна новая feature-ветка. Имя выбираешь ты: git switch -c feature/любое-имя. В имени ветки нельзя пробелы — используй дефис.';
+        if (required.startsWith('git add ')) return 'Сейчас нужно добавить один файл в staging: git add имя-файла.';
+        if (required.startsWith('git commit -m ')) return 'Файл уже добавлен. Теперь создай коммит с любым понятным сообщением: git commit -m "Коротко что изменила".';
+        if (required === 'git push -u origin HEAD') return 'Нужно отправить текущую ветку и связать её с GitLab: git push -u origin HEAD.';
+        return `Эта команда не решает текущую задачу. Подумай о цели: ${scenarios[currentTask][2]}`;
+      }
+      function showTaskHelp() {
+        const [title, story, goal, example, why] = scenarios[currentTask];
+        const commandExample = example.split('\n').filter(line => line.startsWith('git ')).join('\n');
+        const flexibleBranch = commandExample === 'git switch -c feature/profile' ? 'git switch -c feature/твоё-название' : commandExample;
+        say(`Подсказка к задаче «${title}»\n${story}\n${scenarioContext[currentTask]}\n\nЦель: ${goal}\n\nЧто ввести:\n${flexibleBranch}\n\nПочему: ${why}`, 'hint');
+      }
+      function renderTheory() { document.querySelector('#theoryGrid').innerHTML = theory.map(([name,desc,example,note]) => `<article><h3>${name}</h3><p>${desc}</p><pre class="command">${example}</pre><small>Важно: ${note}</small></article>`).join(''); }
+      function renderLiveTask() { const [title, story, goal, example] = scenarios[currentTask]; const steps = example.split('\n').filter(x => x.startsWith('git ')); document.querySelector('#liveTaskNumber').textContent = currentTask + 1; document.querySelector('#liveTaskTitle').textContent = title; document.querySelector('#liveTaskStory').textContent = story; document.querySelector('#liveTaskContext').textContent = scenarioContext[currentTask]; document.querySelector('#liveTaskGoal').innerHTML = `<b>Твоя цель:</b> ${goal}`; document.querySelector('#liveTaskStatus').textContent = `Шаг ${Math.min(state.taskStep + 1, steps.length)} из ${steps.length}`; }
+      function renderTasks() { const [title, story, goal, example, why] = scenarios[currentTask]; document.querySelector('#taskNum').textContent = `СЦЕНАРИЙ ${currentTask + 1} ИЗ 25`; document.querySelector('#taskTitle').textContent = title; document.querySelector('#taskStory').textContent = story; document.querySelector('#taskGoal').innerHTML = `<b>Твоя цель:</b> ${goal}`; document.querySelector('#answerCode').textContent = example; document.querySelector('#answerText').textContent = why; document.querySelector('#scenarioList').innerHTML = scenarios.map((item,i) => `<button class="scenario ${i===currentTask?'active':''} ${state.done.includes(i)?'done':''}" data-task="${i}"><b>${i+1}. ${item[0]}</b><span>${item[2]}</span></button>`).join(''); document.querySelectorAll('[data-task]').forEach(button => button.onclick = () => { currentTask = Number(button.dataset.task); state.taskStep = 0; document.querySelector('#answer').classList.remove('show'); render(); }); }
+      document.querySelector('#commandForm').onsubmit = event => { event.preventDefault(); command(input.value); };
+      input.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); command(input.value); return; } if (event.key === 'Tab') { event.preventDefault(); const match = allCommands.filter(x => x.startsWith(input.value)); if (match.length === 1) input.value = match[0] + ' '; else if (match.length > 1) say(`Варианты: ${match.join(' · ')}`, 'hint'); } if (event.key === 'ArrowUp') { event.preventDefault(); if (history.length) { historyIndex = Math.min(historyIndex + 1, history.length - 1); input.value = history.at(-1-historyIndex); } } if (event.key === 'ArrowDown') { event.preventDefault(); if (historyIndex > 0) { historyIndex--; input.value = history.at(-1-historyIndex); } else { historyIndex = -1; input.value = ''; } } });
+      document.querySelectorAll('[data-view]').forEach(button => button.onclick = () => { document.querySelectorAll('[data-view]').forEach(x => x.classList.toggle('active', x===button)); document.querySelectorAll('.view').forEach(x => x.classList.toggle('active', x.id===button.dataset.view)); if (button.dataset.scroll) document.querySelector('#' + button.dataset.scroll).scrollIntoView({behavior:'smooth', block:'start'}); });
+      document.querySelector('#showAnswer').onclick = () => document.querySelector('#answer').classList.add('show');
+      document.querySelector('#taskHelp').onclick = showTaskHelp;
+      document.querySelector('#nextTask').onclick = () => { currentTask = (currentTask + 1) % scenarios.length; state.taskStep = 0; document.querySelector('#answer').classList.remove('show'); render(); };
+      document.querySelector('#reset').onclick = () => { Object.assign(state, {branch:'feature/payment', dirty:true, staged:false, remote:false, conflict:'', history:['Initial commit','Create develop','Start payment feature'], branches:makeInitialBranches(), done:[], taskStep:0}); currentTask = 0; output.innerHTML = '<span class="ok">Песочница сброшена. Начни с git status.</span>'; render(); };
+      renderTheory(); render();
+    </script>
+  </body>
+</html>
