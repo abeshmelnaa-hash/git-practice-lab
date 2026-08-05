@@ -120,6 +120,16 @@
       .grid > section:first-child .card-head h2::after { content:' · как в GitLab'; color:#8c8792; font-weight:500; }.graph { min-height:560px; padding:16px 18px 6px; background:#fff; }.graph svg { width:100%; height:540px; }.rail { stroke:#d9d2ea; stroke-width:3; }.main-rail { stroke:#5b36d6; }.feature-rail { stroke:#ff5f45; }.node { stroke:#fff; stroke-width:3; }.node.main { fill:#5b36d6; }.node.feature { fill:#ff5f45; }.node.hotfix { fill:#1c9b68; }.graph text { font-size:12px; fill:#4e4955; }.legend { padding:7px 20px 20px; border-top:1px solid var(--line); }.dot { background:#5b36d6; }.dot.feature { background:#ff5f45; }.dot.hotfix { background:#1c9b68; }
       .theory { grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; }.theory article { border-color:var(--line); border-radius:12px; padding:20px; }.theory h3 { color:var(--violet); }.command { border-radius:8px; }.scenario-layout,.scenario-list,#scenarios { display:none; }
       @media (max-width: 900px) { .shell { grid-template-columns:70px minmax(0,1fr); }.topbar { height:76px; padding:0 18px; }.brand { font-size:25px; }.safe { font-size:0; }.safe::before { margin:0; }.grid { grid-template-columns:1fr; }.grid > section:first-child { order:1; }.grid > section:nth-child(2) { order:2; }.live-task .task { grid-template-columns:1fr; padding:18px 22px 24px; }.task-status { text-align:left; }.graph { min-height:420px; }.graph svg { height:420px; } main { padding:30px 20px 52px; } }
+      @media (max-width: 600px) {
+        .topbar { height:72px; padding:0 18px; }.brand { font-size:25px; }.brand b { font-size:21px; }.safe::before { font-size:23px; }
+        .shell { display:block; min-height:0; }.side { border:0; padding:12px 16px 0; }.nav { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0; overflow:visible; }
+        .nav button { display:flex; align-items:center; justify-content:center; height:58px; border:1px solid #27242c; border-radius:10px; background:#fff; font-size:0; color:#17161c; }.nav button::before { width:auto; height:auto; font-size:22px; margin-right:8px; }.nav button::after { font-size:14px; font-weight:800; letter-spacing:-.02em; }.nav button[data-view="lab"]::after { content:'Терминал'; }.nav button[data-view="theory"]::after { content:'Теория'; }.nav button:hover,.nav button.active { color:var(--orange); background:#fff8f6; border-color:var(--orange); }.nav button.active::after { position:static; width:auto; height:auto; background:transparent; }
+        main { padding:30px 18px 46px; }.hero { display:block; margin-bottom:24px; }.hero h1 { font-size:clamp(40px,12vw,50px); line-height:.94; letter-spacing:-.075em; margin-bottom:14px; }.hero p { font-size:16px; line-height:1.45; }.progress { display:none; }
+        .live-task { border-width:2px; border-radius:16px; margin-bottom:22px; }.live-task .card-head { display:block; padding:19px 20px 0; }.live-task .card-head h2 { margin-bottom:13px; font-size:17px; }.live-task .card-head > div { display:grid; grid-template-columns:1fr; gap:9px; }.live-task .card-head .button { min-height:46px; width:100%; font-size:15px; }.live-task .label { display:flex; align-items:center; min-height:28px; width:max-content; max-width:100%; line-height:1.2; }
+        .live-task .task { padding:18px 20px 22px; gap:14px; }.live-task h2 { font-size:40px; line-height:.94; margin:0 0 16px; }.live-task p { font-size:17px; line-height:1.45; }.live-task .task-context { font-size:14px; line-height:1.55; }.live-task .goal { margin-top:18px; padding:13px 14px; font-size:14px; line-height:1.45; }.task-status { font-size:13px; }
+        .grid { gap:18px; }.card { border-radius:14px; }.card-head { padding:16px 17px; }.card h2,.card h3 { font-size:17px; }.grid > section:nth-child(2) .card-head { padding:16px 17px 11px; }.state { padding:0 17px 12px; font-size:11px; overflow-wrap:anywhere; }.terminal { margin:0 12px 14px; border-radius:12px; }.terminal-head { padding:12px; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }.terminal-out { height:230px; padding:14px; font-size:12px; }.command-line { display:grid; grid-template-columns:20px minmax(0,1fr); gap:8px; padding:12px; }.command-line button { grid-column:1 / -1; min-height:48px; width:100%; font-size:15px; }.command-line input { min-height:32px; font-size:14px; }.tips { padding:0 17px 17px; font-size:11px; line-height:1.55; }
+        .graph { min-height:380px; padding:10px 12px 2px; overflow:hidden; }.graph svg { width:100%; height:355px; min-width:0; transform-origin:left top; }.legend { gap:9px 12px; padding:11px 15px 16px; font-size:11px; }.legend span:last-child { width:100%; line-height:1.45; }.label { font-size:9px; padding:5px 6px; }.theory { grid-template-columns:1fr; gap:12px; }.theory article { padding:17px; }
+      }
     </style>
   </head>
   <body>
@@ -242,27 +252,32 @@
       function branchType(name) { return name === 'main' || name === 'develop' ? 'main' : name.startsWith('hotfix/') ? 'hotfix' : 'feature'; }
       function renderGraph() {
         const ordered = Object.entries(state.branches).sort(([a],[b]) => (a === 'main' ? -2 : b === 'main' ? 2 : a === 'develop' ? -1 : b === 'develop' ? 1 : a.localeCompare(b)));
-        const lane = Object.fromEntries(ordered.map(([name], index) => [name, 34 + index * 24]));
+        const compact = window.matchMedia('(max-width: 600px)').matches;
+        const graphWidth = compact ? 340 : 430;
+        const lane = Object.fromEntries(ordered.map(([name], index) => [name, (compact ? 24 : 34) + index * (compact ? 19 : 24)]));
+        const textX = compact ? 185 : 145;
+        const textSize = compact ? 12 : 12;
+        const detailSize = compact ? 9 : 9;
         const rows = ordered.flatMap(([name, data]) => data.commits.slice(-5).reverse().map((message, order) => ({ name, data, message, order })));
         const height = Math.max(430, rows.length * 52 + 58);
         const svg = document.querySelector('#graphSvg');
-        svg.setAttribute('viewBox', `0 0 430 ${height}`); svg.style.height = `${height}px`;
+        svg.setAttribute('viewBox', `0 0 ${graphWidth} ${height}`); svg.style.height = `${height}px`;
         const rails = ordered.map(([name, data]) => {
           const type = branchType(name); const color = type === 'main' ? '#5b36d6' : type === 'hotfix' ? '#1c9b68' : '#ff5f45';
           return `<path d="M${lane[name]} 24 V${height - 22}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
         }).join('');
         const emptyHeads = ordered.filter(([, data]) => data.commits.length === 0).map(([name], emptyIndex) => {
           const x = lane[name]; const type = branchType(name); const color = type === 'main' ? '#5b36d6' : type === 'hotfix' ? '#1c9b68' : '#ff5f45';
-          const labelWidth = Math.min(124, 20 + name.length * 6);
+          const labelWidth = Math.min(compact ? 92 : 124, (compact ? 18 : 20) + name.length * (compact ? 5 : 6));
           const y = height - 34 - emptyIndex * 32;
-          return `<circle cx="${x}" cy="${y}" r="8" fill="#fff" stroke="${color}" stroke-width="3"/><rect x="${x + 18}" y="${y - 13}" width="${labelWidth}" height="25" rx="4" fill="#f4f1ff" stroke="#dfd5ff"/><text x="${x + 26}" y="${y + 4}" fill="#4b2bc0" font-size="10" font-weight="700">${escapeSvg(name)}</text>`;
+          return `<circle cx="${x}" cy="${y}" r="8" fill="#fff" stroke="${color}" stroke-width="3"/><rect x="${x + 16}" y="${y - 13}" width="${labelWidth}" height="25" rx="4" fill="#f4f1ff" stroke="#dfd5ff"/><text x="${x + 23}" y="${y + 4}" fill="#4b2bc0" font-size="${compact ? 9 : 10}" font-weight="700">${escapeSvg(name)}</text>`;
         }).join('');
         const commits = rows.map((row, index) => {
           const y = 33 + index * 52; const x = lane[row.name]; const type = branchType(row.name); const color = type === 'main' ? '#5b36d6' : type === 'hotfix' ? '#1c9b68' : '#ff5f45';
-          const isHead = row.order === 0; const tag = isHead ? `<rect x="${x + 18}" y="${y - 14}" width="${Math.min(124, 20 + row.name.length * 6)}" height="25" rx="4" fill="#f4f1ff" stroke="#dfd5ff"/><text x="${x + 26}" y="${y + 3}" fill="#4b2bc0" font-size="10" font-weight="700">${escapeSvg(row.name)}</text>` : '';
+          const isHead = row.order === 0; const tag = isHead ? `<rect x="${x + 16}" y="${y - 14}" width="${Math.min(compact ? 92 : 124, (compact ? 18 : 20) + row.name.length * (compact ? 5 : 6))}" height="25" rx="4" fill="#f4f1ff" stroke="#dfd5ff"/><text x="${x + 23}" y="${y + 3}" fill="#4b2bc0" font-size="${compact ? 9 : 10}" font-weight="700">${escapeSvg(row.name)}</text>` : '';
           const hash = `a${String(480 + index * 137).padStart(6, '0')}`;
           const branchJoin = row.data.from && row.order === row.data.commits.length - 1 ? `<path d="M${lane[row.data.from] || x} ${y - 32} C${lane[row.data.from] || x} ${y - 8} ${x} ${y - 14} ${x} ${y}" fill="none" stroke="#bfb7d2" stroke-width="2"/>` : '';
-          return `${branchJoin}<circle cx="${x}" cy="${y}" r="8" fill="${color}" stroke="#fff" stroke-width="3"/><text x="${Math.max(145, x + 145)}" y="${y - 4}" fill="#26222d" font-size="12" font-weight="700">${escapeSvg(row.message)}</text><text x="${Math.max(145, x + 145)}" y="${y + 14}" fill="#8b8493" font-size="9">${hash} · только что</text>${tag}`;
+          return `${branchJoin}<circle cx="${x}" cy="${y}" r="8" fill="${color}" stroke="#fff" stroke-width="3"/><text x="${Math.max(textX, x + (compact ? 108 : 145))}" y="${y - 4}" fill="#26222d" font-size="${textSize}" font-weight="700">${escapeSvg(row.message)}</text><text x="${Math.max(textX, x + (compact ? 108 : 145))}" y="${y + 14}" fill="#8b8493" font-size="${detailSize}">${hash} · только что</text>${tag}`;
         }).join('');
         svg.innerHTML = `${rails}${emptyHeads}${commits}`;
       }
