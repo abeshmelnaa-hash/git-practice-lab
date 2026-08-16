@@ -343,5 +343,6 @@
       document.querySelector('#reset').onclick = () => { Object.assign(state, {branch:'feature/payment', dirty:true, staged:false, remote:false, conflict:'', history:['Initial commit','Create develop','Start payment feature'], branches:makeInitialBranches(), done:[], taskStep:0}); currentTask = 0; output.innerHTML = '<span class="ok">Песочница сброшена. Начни с git status.</span>'; render(); };
       renderTheory(); render();
     </script>
+    <!-- Проверка командного деплоя -->
   </body>
 </html>
